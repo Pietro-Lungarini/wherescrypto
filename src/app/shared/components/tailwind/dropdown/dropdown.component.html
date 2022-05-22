@@ -1,0 +1,47 @@
+<div
+	class="dropdown relative inline-block text-left"
+	[ngClass]="{
+	'w-full': wFull,
+	'inline-block text-left': !useFlex,
+	'inline-flex h-full': useFlex
+	}"
+>
+	<div (click)="$event.stopPropagation(); toggleDropdown()" [ngClass]="{ 'w-full': wFull }" [id]="dropdownId" type="button" data-toggle="dropdown" aria-haspopup="true" [attr.aria-expanded]="isOpen">
+		<ng-content select=".trigger"></ng-content>
+	</div>
+	<div
+		role="menu"
+		[attr.aria-orientation]="orientation"
+		[attr.aria-labelledby]="dropdownId"    
+		class="{{ positionClasses }} dropdown-menu shadow-2xl transform transition-all duration-100 z-20"
+		[ngClass]="{
+			'overflow-visible': overflowVisible,
+			'bg-white': !customOptions,
+			'hidden': !isOpen && !transitionStarted,
+			'block ease-out opacity-100 scale-100': isOpen,
+			'ease-in opacity-0 scale-95': !isOpen
+		}"
+	>
+		<ng-container *ngIf="!customOptions; else customInner">
+			<ng-container *ngFor="let option of options; let iParent = index;">
+				<ng-container *ngIf="!!option && option.type === 'group'; else singleOption">
+					<div *ngFor="let child of option.childrens; let iChild = index" (click)="optionClicked(child, iParent, iChild)" class="py-1">
+					<a [routerLink]="child.url" class="dropdown-item" [ngClass]="{ 'selected': child.selected }" role="menuitem">
+						<i-bs *ngIf="!!child.icon" class="inline-block mr-1" style="transform: translateY(2.5px)" width="1rem" height="1rem" [name]="child.icon"></i-bs>
+						{{child.name}}
+					</a>
+					</div>
+				</ng-container>
+				<ng-template #singleOption>
+					<a [routerLink]="option.url" (click)="optionClicked(option, iParent)" class="dropdown-item" [ngClass]="{ 'selected': option.selected }" role="menuitem">
+						<i-bs *ngIf="!!option.icon" class="inline-block mr-1" style="transform: translateY(2.5px)" width="1rem" height="1rem" [name]="option.icon"></i-bs>
+						{{option.name}}
+					</a>
+				</ng-template>
+			</ng-container>
+		</ng-container>
+		<ng-template #customInner>
+			<ng-content #customOptionsEl select=".custom-options"></ng-content>
+		</ng-template>
+	</div>
+</div>

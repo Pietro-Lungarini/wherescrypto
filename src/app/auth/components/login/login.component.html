@@ -1,0 +1,71 @@
+<p class="text-xl text-gray-600 dark:text-gray-200 text-center">{{pageTitle}}</p>
+
+<app-social-login></app-social-login>
+
+<div class="mt-4 flex items-center justify-between">
+    <span class="border-b dark:border-gray-600 w-1/5 lg:w-1/4"></span>
+
+    <p class="text-xs text-center text-gray-500 dark:text-gray-400 uppercase">O utilizza l'email</p>
+
+    <span class="border-b dark:border-gray-400 w-1/5 lg:w-1/4"></span>
+</div>
+
+<form [formGroup]="form" (ngSubmit)="emailLogin(form)">
+    <div class="mt-4 w-full">
+        <input
+            formControlName="email" type="email" id="email" placeholder="Indirizzo Email" required="required" aria-label="Email Address"
+            class="dark:text-gray-200 w-full mt-2 py-2 px-4 bg-white dark:bg-black-800 text-gray-700 border border-gray-300 dark:border-gray-600 rounded block placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 dark:focus:border-blue-500 focus:outline-none focus:ring">
+    </div>
+
+    <div class="mt-4 w-full flex">
+        <input
+            formControlName="password" id="password" [type]="hide ? 'password' : 'text'" pattern="^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{0,30}$" required="required" placeholder="Password" aria-label="Password"
+            class="dark:text-gray-200 w-full mt-2 py-2 px-4 bg-white dark:bg-black-800 text-gray-700 border border-gray-300 dark:border-gray-600 rounded-l block placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 dark:focus:border-blue-500 focus:outline-none focus:ring">
+        <span (click)="hide = !hide" class="cursor-pointer transition duration-200 dark:text-gray-500 dark:hover:text-gray-200 w-max mt-2 py-2 px-4 bg-white dark:bg-black-800 text-gray-700 border border-gray-300 dark:border-gray-600 rounded-r block">
+            <i-bs class="block" [name]="hide ? 'eye-fill' : 'eye-slash-fill'" width="1.25rem" height="1.25rem" style="margin-top: 0.15rem;"></i-bs>
+        </span>    
+    </div>
+
+    <ng-template #formErrorsIcon>
+        <div class="bg-red-200 text-red-700 rounded-full p-1 fill-current mr-3 w-min inline-block transform translate-y-2">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </div>
+    </ng-template>
+
+    <ng-container *ngIf="loginError">
+        <span class="font-medium text-sm text-red-400 my-5 block">
+            <ng-container *ngTemplateOutlet="formErrorsIcon"></ng-container>
+            {{ loginError }}
+        </span>
+    </ng-container>
+
+    <ng-container *ngIf="form.controls.email.touched && form.controls.email.invalid">
+        <span class="font-medium text-sm text-red-400 my-5 block">
+            <ng-container *ngTemplateOutlet="formErrorsIcon"></ng-container>
+            {{ getEmailErrMsg() }}
+        </span>
+    </ng-container>
+
+    <ng-container *ngIf="form.controls.password.touched && form.controls.password.invalid">
+        <span class="font-medium text-sm text-red-400 my-5 block">
+            <ng-container *ngIf="form.controls.password.invalid && !form.controls.password.errors?.pattern">
+                <ng-container *ngTemplateOutlet="formErrorsIcon"></ng-container>
+                {{ getPasswErrMsg() }}
+            </ng-container>
+            <ng-container *ngIf="form.controls.password.errors?.pattern">
+                <ng-container *ngTemplateOutlet="formErrorsIcon"></ng-container>
+                La password deve contenere almeno una lettera maiuscola, una minuscola e un numero.
+            </ng-container>
+        </span>
+    </ng-container>
+
+    <div class="flex justify-between items-center mt-4">
+        <a routerLink="/auth/reset/new-password" class="text-gray-600 dark:text-gray-200 text-sm hover:text-gray-500">Hai dimenticato la password?</a>
+
+        <button [disabled]="!form.valid" class="btn primary" type="submit">
+            Accedi
+        </button>
+    </div>
+</form>

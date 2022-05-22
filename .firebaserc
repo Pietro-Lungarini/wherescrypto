@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "wherescrypto-bot": {
+      "hosting": {
+        "wherescrypto-bot": [
+          "vision-gold"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "wherescrypto-bot"
+  }
+}

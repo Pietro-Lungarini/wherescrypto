@@ -1,0 +1,32 @@
+<div class="relative inline-block">
+    <div (mouseenter)="toggleTooltip(true)" (mouseleave)="toggleTooltip(false)" [id]="tooltipId" type="button" aria-haspopup="true" [attr.aria-expanded]="isOpen">
+        <ng-content select=".trigger"></ng-content>
+    </div>
+
+    <div
+        role="menu"
+        [attr.aria-orientation]="orientation"
+        [attr.aria-labelledby]="tooltipId"    
+        class="{{ positionClasses }} tooltip transform transition duration-100"
+        [ngClass]="{
+            'bg-white': !isHtml,
+            'hidden': !isOpen && !transitionStarted,
+            'block': isOpen,
+            'opacity-0': !isOpen,
+            'opacity-100': isOpen,
+            'scale-95': !isOpen,
+            'scale-100': isOpen
+        }"
+    >
+        <ng-container *ngIf="!isHtml; else html">
+            <ng-container *ngIf="!!text">
+                <p>{{text}}</p>
+            </ng-container>
+        </ng-container>
+        <ng-template #html>
+                <ng-content select=".tooltip-content"></ng-content>
+        </ng-template>
+    </div>
+</div>
+
+

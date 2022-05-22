@@ -1,0 +1,140 @@
+<div class="bg-black-800 min-h-full">
+  <div class="bg-black-900 pb-32">
+    <nav class="bg-black-900">
+      <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="border-b border-gray-700">
+          <div class="flex items-center justify-between h-16 px-4 sm:px-0">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <img routerLink="/" class="w-36 cursor-pointer" src="assets/logo/vision_gold.png" alt="Vision Gold">
+              </div>
+              <div class="hidden md:block">
+                <div class="ml-10 flex items-baseline space-x-4">
+									<a
+										*ngFor="let item of nav"
+										routerLinkActive="bg-primary-4 hover:bg-primary-4 text-white"
+										class="text-gray-300 hover:bg-primary-3 hover:bg-opacity-20 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+										[routerLink]="item.url"
+										[routerLinkActiveOptions]="{ exact: true }"
+									>{{item.name}}</a>
+                </div>
+              </div>
+            </div>
+            <div class="hidden md:block">
+              <div class="ml-4 flex items-center md:ml-6">
+                <button type="button" class="bg-black-800 p-1 text-gray-400 rounded-full hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black-800 focus:ring-white">
+                  <span class="sr-only">View notifications</span>
+                  <!-- Heroicon name: outline/bell -->
+                  <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                  </svg>
+                </button>
+
+                <!-- Profile dropdown -->
+                <div class="ml-3 relative">
+									<app-dropdown [options]="options" [menuAddSpacing]="2" [closeOnOptionClick]="true" (isMenuOpen)="profileMenuOpen = $event" (onOptionClicked)="optClicked($event)" menuPosition="v-bottom-right">
+										<div class="trigger ml-2 mr-2">
+											<app-avatar [showRing]="profileMenuOpen" [user]="user" [imgMarginTopFix]="true" [enableProfileLink]="false" displayType="img"></app-avatar>
+										</div>
+									</app-dropdown>
+                </div>
+              </div>
+            </div>
+
+						<div class="md:hidden">
+							<app-dropdown [customOptions]="true" [closeOnOptionClick]="true" (isMenuOpen)="mobileMenuOpen = $event" menuPosition="v-bottom-right">
+								<div class="trigger -mr-2 flex">
+									<!-- Mobile menu button -->
+									<button type="button" class="bg-black-800 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-black-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black-800 focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
+										<svg *ngIf="!mobileMenuOpen" class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+										</svg>
+										<svg *ngIf="mobileMenuOpen" class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+										</svg>
+									</button>
+								</div>
+	
+								<!-- Mobile menu, show/hide based on menu state. -->
+								<div class="custom-options w-screen max-w-xs border border-gray-700 rounded overflow-hidden bg-black-900">
+									<div class="px-2 py-3 space-y-1 sm:px-3">
+										<a
+											*ngFor="let item of nav"
+											routerLinkActive="bg-primary-4 hover:bg-primary-4 text-white"
+											class="block text-gray-300 hover:bg-primary-3 hover:bg-opacity-20 hover:text-white px-3 py-2 rounded-md text-base font-medium"
+											[routerLink]="item.url"
+										>{{item.name}}</a>
+									</div>
+									<div class="pt-4 pb-3 border-t border-gray-700">
+										<div class="flex items-center px-5 max-w-full">
+											<div class="flex-shrink-0">
+												<app-avatar [showRing]="profileMenuOpen" [user]="user" [imgMarginTopFix]="true" [enableProfileLink]="false" displayType="img"></app-avatar>
+											</div>
+											<div class="ml-3 mt-1">
+												<p class="block text-sm font-medium text-white line-clamp-1 pr-2">{{user?.fullName}}</p>
+												<p class="block text-xs font-medium text-gray-400 line-clamp-1 pr-2">{{user?.email}}</p>
+											</div>
+											<button type="button" class="ml-auto bg-black-800 flex-shrink-0 p-1 text-gray-400 rounded-full hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
+												<span class="sr-only">View notifications</span>
+												<!-- Heroicon name: outline/bell -->
+												<svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+												</svg>
+											</button>
+										</div>
+										<div class="mt-5 px-2 space-y-1">
+											<div
+												*ngFor="let option of options"
+												[routerLink]="option.url"
+											>
+												<ng-container *ngIf="!!option && option.type === 'group'; else singleOption">
+													<div *ngFor="let child of option.childrens;" (click)="optClicked(child)" class="py-1">
+														<a
+															[routerLink]="child.url"
+															class="block text-gray-300 hover:bg-primary-3 hover:bg-opacity-20 hover:text-white px-3 py-2 rounded-md text-base font-medium"
+														>
+															<i-bs *ngIf="!!child.icon" class="inline-block mr-1" style="transform: translateY(2.5px)" width="1rem" height="1rem" [name]="child.icon"></i-bs>
+															{{child.name}}
+														</a>
+													</div>
+												</ng-container>
+												<ng-template #singleOption>
+													<a
+														[routerLink]="option.url"
+														class="block text-gray-300 hover:bg-primary-3 hover:bg-opacity-20 hover:text-white px-3 py-2 rounded-md text-base font-medium"
+														(click)="optClicked(option)"
+													>
+														<i-bs *ngIf="!!option.icon" class="inline-block mr-1" style="transform: translateY(2.5px)" width="1rem" height="1rem" [name]="option.icon"></i-bs>
+														{{option.name}}
+													</a>
+												</ng-template>
+											</div>
+										</div>
+									</div>
+								</div>
+							</app-dropdown>
+						</div>
+
+          </div>
+        </div>
+      </div>
+
+
+    </nav>
+    <header class="py-10">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 class="text-3xl font-bold text-white">
+          {{childPageTitle}}
+        </h1>
+      </div>
+    </header>
+  </div>
+
+  <main class="-mt-32">
+    <div class="max-w-7xl mx-auto pb-12 px-4 sm:px-6 lg:px-8">
+			
+      <router-outlet (activate)="routeChanged($event)"></router-outlet>
+
+    </div>
+  </main>
+</div>

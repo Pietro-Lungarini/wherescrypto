@@ -1,0 +1,54 @@
+{
+	"name": "wherescrypto",
+	"scripts": {
+		"lint": "eslint --ext .js --ext .ts --ignore-pattern node_modules/",
+		"build": "tsc",
+		"deploy": "firebase deploy --only functions",
+		"telegramBotListener": "firebase deploy --only functions:telegramBotListener",
+		"onNewSignal": "firebase deploy --only functions:onNewSignal",
+		"onNewFuturesSignal": "firebase deploy --only functions:onNewFuturesSignal",
+		"getTransactionUrl": "firebase deploy --only functions:getTransactionUrl",
+		"onPubKeyChange": "firebase deploy --only functions:onPubKeyChange",
+		"discord": "firebase deploy --only functions:discord",
+		"verifyClient": "firebase deploy --only functions:verifyClient",
+		"firebaseConfig": "firebase functions:config:set ",
+		"logs": "firebase functions:log"
+	},
+	"engines": {
+		"node": "16"
+	},
+	"main": "lib/index.js",
+	"dependencies": {
+		"@discordjs/builders": "^0.11.0",
+		"@discordjs/rest": "0.4.1",
+		"@solana/pay": "0.2.0",
+		"@solana/spl-token": "^0.1.8",
+		"@solana/web3.js": "1.41.4",
+		"@types/nightmare": "2.10.6",
+		"axios": "0.27.2",
+		"binance-api-node": "0.11.36",
+		"discord-api-types": "^0.26.1",
+		"discord.js": "^13.6.0",
+		"firebase-admin": "10.2.0",
+		"firebase-functions": "^3.21.2",
+		"kucoin-api": "0.0.3",
+		"lodash": "4.17.21",
+		"metaapi.cloud-sdk": "^19.5.0",
+		"puppeteer": "13.7.0",
+		"telegraf": "4.8.1"
+	},
+	"devDependencies": {
+		"@typescript-eslint/eslint-plugin": "^5.22.0",
+		"@typescript-eslint/parser": "^5.22.0",
+		"eslint": "^8.14.0",
+		"eslint-config-google": "^0.14.0",
+		"eslint-plugin-import": "^2.26.0",
+		"firebase-functions-test": "^0.2.0",
+		"input": "^1.0.1",
+		"telegram": "^2.8.2",
+		"typescript": "^4.6.4"
+	},
+	"private": true,
+	"keywords": [],
+	"description": ""
+}

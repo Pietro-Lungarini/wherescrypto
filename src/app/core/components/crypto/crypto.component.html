@@ -1,0 +1,34 @@
+<div class="grid grid-cols-1 gap-4 items-start lg:grid-cols-4 lg:gap-4">
+	<!-- Left column -->
+	<div class="grid grid-cols-1 gap-4 lg:col-span-3">
+		<div class="rounded-lg bg-black-700 shadow-xl overflow-hidden h-96 p-6">
+			
+			<app-select-exchange
+				(onClick)="selectExchange($event)"
+				*ngIf="!hideSelect"
+				class="show-select"
+				[ngClass]="{
+					'show-select': !show,
+					'hide-select': show
+				}"
+			></app-select-exchange>
+
+			<app-exchange-settings
+				[exchange]="exchange"
+				*ngIf="!hide && hideSelect"
+				(onSave)="closeSettings()"
+				class="hide-settings"
+				[ngClass]="{
+					'show-settings': show,
+					'hide-settings': !show
+				}"
+			></app-exchange-settings>
+
+		</div>
+	</div>
+
+	<!-- Right column -->
+	<div class="grid grid-cols-1 gap-4">
+		
+	</div>
+</div>

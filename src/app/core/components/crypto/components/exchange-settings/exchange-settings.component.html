@@ -1,0 +1,24 @@
+<div *ngIf="exchange">
+	<img *ngIf="exchange.logo" [src]="exchange.logo" [alt]="exchange.id + ' Logo'" class="w-16 mx-auto shadow-2xl mb-4">
+	<h3 class="text-gray-300 text-center">Collega il bot a {{exchange.id}}</h3>
+	<p class="text-center text-gray-400">Inserisci ApiKey e SecretKey dell'exchange.</p>
+
+	<form [formGroup]="form">
+		<input formControlName="apiKey" type="text" id="apiKey" placeholder="Inserisci la tua ApiKey" required="required" aria-label="ApiKey">
+		<input formControlName="secretKey" type="text" id="secretKey" placeholder="Inserisci la tua SecretKey" required="required" aria-label="SecretKey">
+		
+		<div class="flex flex-row items-center">
+			<input class="flex-1" formControlName="priority" type="number" id="priority" placeholder="Seleziona una priorità (1-10)" min="1" max="10" required="required" aria-label="Priorità">
+			<div class="group relative">
+				<i-bs class="block ml-3 mr-1 cursor-pointer hover:text-primary-4" name="question-circle" width="1.25rem" height="1.25rem"></i-bs>
+				<div class="opacity-0 group-hover:opacity-100 absolute -top-16 right-8 bg-black-800 border border-gray-600 rounded-md p-4 w-64 pointer-events-none">
+					<p class="text-sm">La priorità darà precedenza o meno a questo exchange. L'exchange con il valore più basso verrà selezionato.</p>
+				</div>
+			</div>
+		</div>
+	</form>
+
+	<div class="flex justify-end p-4 mt-4">
+		<button (click)="save()" class="btn success">Salva</button>
+	</div>
+</div>

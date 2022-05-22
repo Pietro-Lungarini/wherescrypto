@@ -1,0 +1,265 @@
+// TAILWIND CSS
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@tailwind screens;
+
+
+
+
+// GOOGLE FONTS | Fira Sans - 300, 500, 700, 800.
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700;800&display=swap");
+
+
+// Scrollbar
+html {
+	::-webkit-scrollbar-track {
+		border-color: hsla(0, 0%, 100%, 0.05);
+	}
+	::-webkit-scrollbar-thumb {
+		min-width: 3rem;
+		min-height: 3rem;
+		border: 0.4rem solid transparent;
+		-moz-background-clip: content;
+		-webkit-background-clip: content;
+		background-clip: content-box;
+		border-radius: 1rem;
+		background-color: rgba(255, 255, 255, 0.25);
+
+		&:hover {
+			background-color: rgba(255, 255, 255, 0.4);
+		}
+	}
+	::-webkit-scrollbar-corner {
+		background-color: transparent;
+		border-left: 1px solid hsla(0, 0%, 100%, 0.05); //light rgba(0, 0, 0, 0.1)
+		border-top: 1px solid hsla(0, 0%, 100%, 0.05);
+	}
+	::-webkit-scrollbar {
+		width: 1.2rem;
+		height: 1.2rem;
+		background-color: transparent;
+	}
+
+	&::-webkit-scrollbar-track {
+		border-color: hsla(0, 0%, 100%, 0.05);
+	}
+	&::-webkit-scrollbar-thumb {
+		min-width: 3rem;
+		min-height: 3rem;
+		border: 0.4rem solid transparent;
+		-moz-background-clip: content;
+		-webkit-background-clip: content;
+		background-clip: content-box;
+		border-radius: 1rem;
+		background-color: rgba(255, 255, 255, 0.25);
+
+		&:hover {
+			background-color: rgba(255, 255, 255, 0.4);
+		}
+	}
+	&::-webkit-scrollbar-corner {
+		background-color: transparent;
+		border-left: 1px solid hsla(0, 0%, 100%, 0.05); //light rgba(0, 0, 0, 0.1)
+		border-top: 1px solid hsla(0, 0%, 100%, 0.05);
+	}
+	&::-webkit-scrollbar {
+		width: 1.2rem;
+		height: 1.2rem;
+		background-color: transparent;
+	}
+}
+
+
+html {
+  @apply font-body text-gray-400 text-base;
+}
+body {
+  @apply bg-black-900;
+}
+body.dashboard {
+  @apply overflow-hidden;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  @apply font-display;
+}
+h4,
+h4,
+h5,
+h6 {
+  @apply text-gray-400;
+}
+h1 {
+  @apply text-3xl text-gray-50 font-bold;
+}
+h2 {
+  @apply text-2xl text-gray-300 font-bold;
+}
+h3 {
+  @apply text-xl font-semibold;
+}
+h4 {
+  @apply text-lg font-semibold;
+}
+h5 {
+  @apply text-lg;
+}
+
+// FIXES
+input:not([type="checkbox"]),
+button,
+select,
+textarea,
+.badge,
+.btn,
+[type="button"],
+[type="submit"] {
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+}
+
+* {
+  @apply transition-all duration-100;
+}
+
+// Other styles
+[type='text'],
+[type='email'],
+[type='url'],
+[type='password'],
+[type='number'],
+[type='date'],
+[type='datetime-local'],
+[type='month'],
+[type='search'],
+[type='tel'],
+[type='time'],
+[type='week'],
+[multiple],
+textarea,
+select {
+	@apply dark:text-gray-200 w-full mt-2 py-2 px-4 bg-white dark:bg-black-800 text-gray-700 border border-gray-300 dark:border-gray-600 rounded-md block placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 dark:focus:border-blue-500 focus:outline-none focus:ring;
+}
+
+.dropdown-menu {
+  @apply absolute w-max rounded-md overflow-hidden shadow-lg divide-y divide-gray-100;
+
+  .dropdown-item {
+    @apply block px-4 py-2 text-sm transition ease-in-out duration-200;
+
+    &.selected {
+      @apply bg-gray-400 text-gray-50;
+    }
+    &:not(.selected) {
+      @apply hover:bg-gray-200 focus:bg-gray-300 active:bg-gray-300 text-gray-700 hover:text-gray-900;
+    }
+  }
+}
+
+.tooltip {
+  @apply absolute w-max rounded-md overflow-hidden shadow-lg divide-y divide-gray-100 px-2 text-sm text-gray-700;
+}
+
+.sidebar-item {
+  @apply flex flex-col w-full cursor-pointer text-center rounded-md transition duration-200;
+
+  &:not(.expanded) {
+    @apply py-2 px-0 transition duration-200;
+
+    &:not(.active-route) {
+      @apply dark:text-gray-500 dark:hover:text-gray-400;
+    }
+  }
+  &.expanded {
+    @apply px-4 py-4 transition duration-200;
+
+    &.active-route {
+      @apply dark:bg-black-600;
+    }
+    &:not(.active-route) {
+      @apply dark:text-gray-400 dark:hover:bg-black-700;
+    }
+  }
+  &.active-route {
+    @apply dark:text-gray-50;
+  }
+}
+
+.btn {
+  @apply w-full cursor-pointer disabled:cursor-not-allowed disabled:opacity-60 inline-flex justify-center items-center rounded-md shadow-sm px-4 py-2 text-base font-medium outline-none focus:outline-none sm:w-auto sm:text-sm transition-all duration-200;
+
+	&.accent {
+		&:not([disabled]) {
+			@apply text-gray-50 bg-primary-4 hover:bg-primary-3 focus:ring-2 focus:ring-offset-2 focus:ring-offset-black-700 focus:ring-primary-2;
+		}
+		&[disabled] {
+			@apply text-gray-200 bg-primary-4 cursor-not-allowed;
+		}
+	}
+
+  &.primary {
+    @apply text-gray-50;
+
+    &.light {
+      @apply bg-black-600;
+    }
+    &:not(.light) {
+      @apply bg-black-700;
+    }
+    &.light:not([disabled]) {
+      @apply hover:bg-black-500 focus:ring-2 focus:ring-offset-2 focus:ring-offset-black-700 focus:ring-indigo-500;
+    }
+    &:not(.light):not([disabled]) {
+      @apply hover:bg-black-600 focus:ring-2 focus:ring-offset-2 focus:ring-offset-black-700 focus:ring-indigo-500;
+    }
+  }
+
+  &.secondary {
+    @apply bg-transparent text-gray-400 border border-black-400;
+
+    &:not([disabled]) {
+      @apply hover:bg-black-600 bg-opacity-5;
+    }
+  }
+
+  &.danger {
+    @apply bg-red-500 text-gray-50;
+
+    &:not([disabled]) {
+      @apply hover:bg-red-700 focus:ring-2 focus:ring-offset-2 focus:ring-offset-black-700 focus:ring-red-500;
+    }
+  }
+
+  &.success {
+    @apply bg-green-500 text-gray-50;
+
+    &:not([disabled]) {
+      @apply hover:bg-green-700 focus:ring-2 focus:ring-offset-2 focus:ring-offset-black-700 focus:ring-green-500;
+    }
+  }
+}
+
+.badge {
+  @apply inline-block text-gray-50 bg-gray-50 px-3 py-1 text-xs tracking-wider font-bold;
+
+  &:not(.pill) {
+    @apply rounded;
+  }
+  &.pill {
+    @apply rounded-full;
+  }
+  &.translucent {
+    @apply antialiased;
+    --tw-bg-opacity: 0.3 !important;
+  }
+}
+
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}

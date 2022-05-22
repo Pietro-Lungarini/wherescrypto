@@ -1,0 +1,60 @@
+// Select
+@keyframes opacityAnimationSelectIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0rem);
+  }
+}
+@keyframes opacityAnimationSelectOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10rem);
+  }
+}
+
+// Settings
+@keyframes opacityAnimationSettingsIn {
+  from {
+    opacity: 0;
+    transform: translateY(10rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0rem);
+  }
+}
+@keyframes opacityAnimationSettingsOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(10rem);
+  }
+}
+
+
+.show-select {
+	animation: opacityAnimationSelectIn .5s ease-in-out;
+}
+.hide-select {
+	animation: opacityAnimationSelectOut .5s ease-in-out;
+	animation-fill-mode: forwards;
+}
+
+.show-settings {
+	animation: opacityAnimationSettingsIn .5s ease-in-out;
+}
+.hide-settings {
+	animation: opacityAnimationSettingsOut .5s ease-in-out;
+	animation-fill-mode: forwards;
+}
