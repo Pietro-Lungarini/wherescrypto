@@ -11,20 +11,22 @@ const getId = (msgId: number, msgDate: Date) => {
 const handleSignal = (msg: Api.Message): ForexSignalSetup | undefined => {
 	const text = msg.message.toLowerCase();
 
-	// Get Cross
-	const cross = () => {
-		const i1 = text.indexOf('🔵');
-		const i2 = text.indexOf('🔵', i1 + 1);
-		const str = text.substring(i1, i2).replace(/🔵/g, '').trim();
-		return str.replace(side() || '', '').replace('limit', '').trim();
-	};
-
-	if (!cross) return;
-
 	// Get Side
 	const side = () => {
 		return text.includes('buy') ? 'buy' : text.includes('sell') ? 'sell' : undefined;
 	};
+
+	// Get Cross
+	const cross = () => {
+		const sideStr = side() === 'buy' ? '🔵' : '🔴';
+		const sideRegex = side() === 'buy' ? /🔵/g : /🔴/g;
+		const i1 = text.indexOf(sideStr);
+		const i2 = text.indexOf(sideStr, i1 + 1);
+		const str = text.substring(i1, i2).replace(sideRegex, '').trim();
+		return str.replace(side() || '', '').replace('limit', '').trim();
+	};
+
+	if (!cross()) return;
 
 	// Get Entry
 	const entry = () => {

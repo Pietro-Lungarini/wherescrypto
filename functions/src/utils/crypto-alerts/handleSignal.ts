@@ -3,6 +3,10 @@ import {
 	CryptoSignal, CryptoSignalEntry, CryptoSignalExchanges, CryptoSignalSetup, CryptoSignalStopLoss, CryptoSignalTarget,
 } from '../../models/crypto-signal.model';
 
+
+const DB_PATH = 'crypto-alerts';
+
+
 const getPair = (msg: string) => {
 	const a = msg.indexOf('\n\n📈 pair: ');
 	const b = msg.indexOf('\n➡️entry :');
@@ -162,7 +166,15 @@ const getSetup = (msg: string): CryptoSignalSetup => {
 	};
 };
 
-const getSignalType = (msg: string) => {
+const getSignalType = (msg: string):
+| 'update'
+| 'investment'
+| 'ma-investment'
+| 'shad-strategy'
+| 'mt-trading'
+| 'general-analysis'
+| 'signal'
+| undefined => {
 	const m = msg.slice(0, 100).toLowerCase();
 	if (m.includes('update')) return 'update';
 	if (m.includes('investment') && m.includes('1/')) return 'investment';
@@ -177,7 +189,18 @@ const getSignalType = (msg: string) => {
 	return undefined;
 };
 
-export const handleSignal = (msg: string): CryptoSignal => {
+const createId = (signal: CryptoSignal) => {
+	const d = signal.date ? signal.date : new Date();
+	const time = d.getTime();
+	return `${signal.signalType}_${signal.id ? `${signal.id}_` : ''}${signal.setup?.pair ? `${signal.setup?.pair}_` : ''}${time}`;
+};
+
+
+export const cryptoAlertsDbPath = (signal: CryptoSignal) => {
+	return `signals/${DB_PATH}/signals/${createId(signal)}`;
+}
+
+export const handleSignal = (msg: string, msgId?: number, msgDate?: Date): CryptoSignal => {
 	const signalType = getSignalType(msg);
 
 	if (!signalType || signalType === 'general-analysis') {
@@ -187,5 +210,11 @@ export const handleSignal = (msg: string): CryptoSignal => {
 	const m = msg.split('—————————————')[0];
 	const setup = getSetup(m);
 
-	return { signalType, setup, isValid: true, author: 'crypto-alerts' };
+	const signal: CryptoSignal = {
+		signalType, setup, isValid: true, author: 'crypto-alerts', id: msgId, date: msgDate
+	};
+
+	signal.dbId = createId(signal);
+
+	return signal;
 };

@@ -5,9 +5,9 @@ import { NewMessage, NewMessageEvent } from 'telegram/events';
 import { StringSession } from 'telegram/sessions';
 import { CryptoSignal } from '../models/crypto-signal.model';
 import { ForexSignal } from '../models/forex-signal.model';
-import { handleSignal as handleCryptoCoreSignal } from '../utils/crypto-alerts/handleSignal';
+import { cryptoAlertsDbPath, handleSignal as handleCryptoCoreSignal } from '../utils/crypto-alerts/handleSignal';
 import { logger } from '../utils/utils';
-import { fxLegacy } from './channels/handlers/fxLegacy';
+import { fxLegacy, fxLegacyDbPath } from './channels/handlers/fxLegacy';
 import { tgChannels } from './channels/tg-channels';
 
 /* API DOCS: https://gram.js.org/ */
@@ -67,12 +67,6 @@ const isSupportedChannel = (id?: bigInt.BigInteger) => {
 	return isSupported;
 };
 
-const createId = (signal: CryptoSignal) => {
-	const d = signal.date ? signal.date : new Date();
-	const time = d.getTime();
-	return `${signal.signalType}_${signal.id ? `${signal.id}_` : ''}${signal.setup?.pair ? `${signal.setup?.pair}_` : ''}${time}`;
-};
-
 const redirectToSignalHandler = (m: Api.Message) => {
 	if (!m.chatId) return;
 	const normId = BigInt(parseInt(m.chatId?.abs().toString() || '0'));
@@ -101,14 +95,11 @@ const redirectToSignalHandler = (m: Api.Message) => {
 			/* ... */
 			break;
 		case 'cryptoAlerts':
-			cryptoSignal = handleCryptoCoreSignal(m.message);
-			cryptoSignal.date = new Date(m.date || new Date());
+			cryptoSignal = handleCryptoCoreSignal(m.message, m.id, new Date(m.date * 1000));
 			if (!cryptoSignal.isValid) break;
-			cryptoSignal.id = m.id;
-			cryptoSignal.dbId = createId(cryptoSignal);
-			log.info('I\'ve elaborated the signal, updating on the db...');
-			await upsert(`signals/crypto-alerts/signals/${cryptoSignal.dbId}`, cryptoSignal);
-			log.info(`Upload completed for signal ${cryptoSignal.dbId}`);
+			await log.info('I\'ve elaborated the signal, updating on the db...');
+			await upsert(cryptoAlertsDbPath(cryptoSignal), cryptoSignal);
+			await log.info(`Upload completed for signal ${cryptoSignal.dbId}`);
 			break;
 		case 'fxIota':
 			/* ... */
@@ -118,8 +109,8 @@ const redirectToSignalHandler = (m: Api.Message) => {
 			break;
 		case 'fxLegacy':
 			fxSignal = await fxLegacy(m);
-			log.info('I\'ve elaborated the signal, updating on the db...');
-			log.info(fxSignal);
+			await log.info('I\'ve elaborated the signal, updating on the db...');
+			await log.info(fxSignal);
 			break;
 		case 'fxResistance':
 			/* ... */
@@ -127,8 +118,9 @@ const redirectToSignalHandler = (m: Api.Message) => {
 		case 'wheresbebo':
 			/* TESTs ONLY */
 			fxSignal = await fxLegacy(m);
-			log.info('I\'ve elaborated the signal, updating on the db...');
-			log.info(fxSignal);
+			await log.info('I\'ve elaborated the signal, updating on the db...');
+			await upsert(fxLegacyDbPath(m), fxSignal);
+			await log.info(`Upload completed for signal ${fxSignal?.dbId}`);
 			break;
 
 		default:
