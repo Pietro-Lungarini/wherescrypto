@@ -6,18 +6,20 @@ import { logger } from '../../../utils/utils';
 const DB_PATH = 'fxLegacy';
 
 const getId = (msgId: number, msgDate: Date) => {
-	return `signals/${DB_PATH}/signals/fx_${msgId}_${new Date(msgDate).getTime()}`;
+	return `fx_${msgId}_${new Date(msgDate).getTime()}`;
 };
-const handleSignal = (msg: Api.Message): ForexSignalSetup => {
+const handleSignal = (msg: Api.Message): ForexSignalSetup | undefined => {
 	const text = msg.message.toLowerCase();
 
 	// Get Cross
 	const cross = () => {
 		const i1 = text.indexOf('🔵');
-		const i2 = text.indexOf('🔵', i1);
+		const i2 = text.indexOf('🔵', i1 + 1);
 		const str = text.substring(i1, i2).replace(/🔵/g, '').trim();
 		return str.replace(side() || '', '').replace('limit', '').trim();
 	};
+
+	if (!cross) return;
 
 	// Get Side
 	const side = () => {
@@ -27,17 +29,17 @@ const handleSignal = (msg: Api.Message): ForexSignalSetup => {
 	// Get Entry
 	const entry = () => {
 		const i1 = text.indexOf('entry');
-		const i2 = text.indexOf('\n', i1);
+		const i2 = text.indexOf('\n', i1 + 1);
 		const str = text.substring(i1, i2).replace('entry price:', '').trim();
-		return parseInt(str);
+		return parseFloat(str);
 	};
 
 	// Get StopLoss
 	const sl = () => {
 		const i1 = text.indexOf('sl');
-		const i2 = text.indexOf('\n', i1);
+		const i2 = text.indexOf('\n', i1 + 1);
 		const str = text.substring(i1, i2).replace('sl:', '').trim();
-		return parseInt(str);
+		return parseFloat(str);
 	};
 
 	// Get TP1
@@ -48,9 +50,9 @@ const handleSignal = (msg: Api.Message): ForexSignalSetup => {
 			i1 = text.indexOf('tp');
 			replaceStr = 'tp';
 		}
-		const i2 = text.indexOf('\n', i1);
+		const i2 = text.indexOf('\n', i1 + 1);
 		const str = text.substring(i1, i2).replace(`${replaceStr}:`, '').trim();
-		return parseInt(str);
+		return parseFloat(str);
 	};
 
 	// Get TP2
@@ -62,9 +64,9 @@ const handleSignal = (msg: Api.Message): ForexSignalSetup => {
 			i1 = text.indexOf('tp');
 			replaceStr = 'tp';
 		}
-		const i2 = text.indexOf('\n', i1);
+		const i2 = text.indexOf('\n', i1 + 1);
 		const str = text.substring(i1, i2).replace(`${replaceStr}:`, '').trim();
-		return parseInt(str);
+		return parseFloat(str);
 	};
 
 	// Get TP3
@@ -76,9 +78,9 @@ const handleSignal = (msg: Api.Message): ForexSignalSetup => {
 			i1 = text.indexOf('tp');
 			replaceStr = 'tp';
 		}
-		const i2 = text.indexOf('\n', i1);
+		const i2 = text.indexOf('\n', i1 + 1);
 		const str = text.substring(i1, i2).replace(`${replaceStr}:`, '').trim();
-		return parseInt(str);
+		return parseFloat(str);
 	};
 
 	return {
@@ -96,7 +98,7 @@ const handleUpdate = async (msg: Api.Message): Promise<ForexSignal | undefined> 
 	const original = await msg.getReplyMessage();
 	const msgId = original?.id || Math.random();
 	const text = msg.message.toLowerCase();
-	const dbId = getId(msgId, new Date(msg.date) || new Date());
+	const dbId = getId(msgId, new Date(msg.date * 1000) || new Date());
 
 	const docRef = firestore().doc(dbId);
 	const document = await docRef.get();
@@ -133,8 +135,12 @@ const handleUpdate = async (msg: Api.Message): Promise<ForexSignal | undefined> 
 			},
 		};
 	}
-	/* THIS IS A COMMIT TEST */
+
 	return;
+};
+
+export const fxLegacyDbPath = (msg: Api.Message) => {
+	return `signals/${DB_PATH}/signals/${getId(msg.id, new Date(msg.date * 1000))}`;
 };
 
 export const fxLegacy = async (msg: Api.Message): Promise<ForexSignal | undefined> => {
@@ -143,14 +149,17 @@ export const fxLegacy = async (msg: Api.Message): Promise<ForexSignal | undefine
 		return await handleUpdate(msg);
 	} else {
 		logger.info('isNotReply');
+		const elabSetup = handleSignal(msg);
+		let isValid = true;
+		if (!elabSetup) isValid = false;
 		return {
 			channel: 'fxLegacy',
-			isValid: true,
+			isValid: isValid,
 			action: 'new',
-			date: new Date(msg.date),
-			dbId: getId(msg.id, new Date(msg.date) || new Date()),
+			date: new Date(msg.date * 1000),
+			dbId: getId(msg.id, new Date(msg.date * 1000) || new Date()),
 			id: msg.id,
-			setup: handleSignal(msg),
+			setup: elabSetup,
 		};
 	}
 };

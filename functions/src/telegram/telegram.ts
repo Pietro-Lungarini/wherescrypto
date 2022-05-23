@@ -126,6 +126,9 @@ const redirectToSignalHandler = (m: Api.Message) => {
 			break;
 		case 'wheresbebo':
 			/* TESTs ONLY */
+			fxSignal = await fxLegacy(m);
+			log.info('I\'ve elaborated the signal, updating on the db...');
+			log.info(fxSignal);
 			break;
 
 		default:
@@ -144,7 +147,7 @@ export const listenForTgMessages = async () => {
 		if (!isSupported) return log.error(`Questo canale non è supportato per i segnali: ${msg.chatId}`);
 		/* log.info(`msg => ${message.message}\n\nsupported => ${isSupported}`, 'listenForTgMessages'); */
 		redirectToSignalHandler(msg);
-		log.info(`This message was sent on Timestamp (RAW): ${msg.date} Date: ${new Date(msg.date)}`);
+		log.info(`This message was sent on Date: ${new Date(msg.date * 1000)}`);
 	}
 
 	client.addEventHandler(handler, new NewMessage({}));

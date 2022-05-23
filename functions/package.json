@@ -3,16 +3,17 @@
 	"scripts": {
 		"lint": "eslint --ext .js --ext .ts --ignore-pattern node_modules/",
 		"build": "tsc",
-		"deploy": "firebase deploy --only functions",
-		"telegramBotListener": "firebase deploy --only functions:telegramBotListener",
-		"onNewSignal": "firebase deploy --only functions:onNewSignal",
-		"onNewFuturesSignal": "firebase deploy --only functions:onNewFuturesSignal",
-		"getTransactionUrl": "firebase deploy --only functions:getTransactionUrl",
-		"onPubKeyChange": "firebase deploy --only functions:onPubKeyChange",
-		"discord": "firebase deploy --only functions:discord",
-		"verifyClient": "firebase deploy --only functions:verifyClient",
-		"firebaseConfig": "firebase functions:config:set ",
-		"logs": "firebase functions:log"
+		"deploy": "yarn f deploy --only functions",
+		"telegramBotListener": "yarn f deploy --only functions:telegramBotListener",
+		"onNewSignal": "yarn f deploy --only functions:onNewSignal",
+		"onNewFuturesSignal": "yarn f deploy --only functions:onNewFuturesSignal",
+		"getTransactionUrl": "yarn f deploy --only functions:getTransactionUrl",
+		"onPubKeyChange": "yarn f deploy --only functions:onPubKeyChange",
+		"discord": "yarn f deploy --only functions:discord",
+		"verifyClient": "yarn f deploy --only functions:verifyClient",
+		"firebaseConfig": "yarn f functions:config:set ",
+		"logs": "yarn f functions:log",
+		"f": "firebase --token '1//03vvn6XVmN6iMCgYIARAAGAMSNwF-L9IrfJjBf49x4QtM_c9759Npzm5MIigSirtEOoSQzF46GeHe9Nvq6WWgkplsuwFQuG77Ap4'"
 	},
 	"engines": {
 		"node": "16"
