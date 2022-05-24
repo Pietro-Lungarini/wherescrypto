@@ -3,13 +3,13 @@ import { Api } from 'telegram';
 import { ForexSignal, ForexSignalSetup } from '../../../models/forex-signal.model';
 import { logger } from '../../../utils/utils';
 
-const DB_PATH = 'fxLegacy';
+const DB_PATH = 'fxIota';
 
 const getId = (msgId: number, msgDate: Date) => {
 	return `fx_${msgId}_${new Date(msgDate).getTime()}`;
 };
 const handleSignal = (msg: Api.Message): ForexSignalSetup | undefined => {
-	const text = msg.message.toLowerCase();
+	const text = msg.message.toLowerCase() + '\n';
 
 	// Get Side
 	const side = () => {
@@ -18,19 +18,21 @@ const handleSignal = (msg: Api.Message): ForexSignalSetup | undefined => {
 
 	// Get Cross
 	const cross = () => {
-		const sideStr = side() === 'buy' ? '🔵' : '🔴';
-		const sideRegex = side() === 'buy' ? /🔵/g : /🔴/g;
-		const i1 = text.indexOf(sideStr);
-		const i2 = text.indexOf(sideStr, i1 + 1);
-		const str = text.substring(i1, i2).replace(sideRegex, '').trim();
-		return str.replace(side() || '', '').replace('limit', '').trim();
+		const i1 = 0;
+		const i2 = text.indexOf('\n');
+		const str = text.substring(i1, i2).trim();
+		return str;
 	};
 
 	if (!cross()) return;
 
+	const type = () => {
+		return text.includes('limit') ? 'limit' : 'market';
+	};
+
 	// Get Entry
 	const entry = () => {
-		const i1 = text.indexOf('entry');
+		const i1 = text.indexOf('@');
 		const i2 = text.indexOf('\n', i1 + 1);
 		const str = text.substring(i1, i2).replace(/([^0-9.])/g, '').trim();
 		return parseFloat(str);
@@ -38,9 +40,10 @@ const handleSignal = (msg: Api.Message): ForexSignalSetup | undefined => {
 
 	// Get StopLoss
 	const sl = () => {
-		const i1 = text.indexOf('sl');
-		const i2 = text.indexOf('\n', i1 + 1);
-		const str = text.substring(i1, i2).replace(/([^0-9.])/g, '').trim();
+		const normText = text.replace(/\(.*\)/, '').trim();
+		const i1 = normText.indexOf('sl');
+		const i2 = normText.indexOf('\n', i1 + 1);
+		const str = normText.substring(i1, i2).replace(/([^0-9.])/g, '').trim();
 		return parseFloat(str);
 	};
 
@@ -61,11 +64,7 @@ const handleSignal = (msg: Api.Message): ForexSignalSetup | undefined => {
 	const tp2 = () => {
 		let replaceStr = 'tp2';
 		if (!text.includes(replaceStr)) return undefined;
-		let i1 = text.indexOf(replaceStr);
-		if (i1 === -1) {
-			i1 = text.indexOf('tp');
-			replaceStr = 'tp';
-		}
+		const i1 = text.indexOf(replaceStr);
 		const i2 = text.indexOf('\n', i1 + 1);
 		const str = text.substring(i1, i2).replace(/([^0-9.])/g, '').trim();
 		return parseFloat(str);
@@ -74,12 +73,9 @@ const handleSignal = (msg: Api.Message): ForexSignalSetup | undefined => {
 	// Get TP3
 	const tp3 = () => {
 		let replaceStr = 'tp3';
+		if (text.includes('open')) return 'open';
 		if (!text.includes(replaceStr)) return undefined;
-		let i1 = text.indexOf(replaceStr);
-		if (i1 === -1) {
-			i1 = text.indexOf('tp');
-			replaceStr = 'tp';
-		}
+		const i1 = text.indexOf(replaceStr);
 		const i2 = text.indexOf('\n', i1 + 1);
 		const str = text.substring(i1, i2).replace(/([^0-9.])/g, '').trim();
 		return parseFloat(str);
@@ -88,26 +84,20 @@ const handleSignal = (msg: Api.Message): ForexSignalSetup | undefined => {
 	// Get TP4
 	const tp4 = () => {
 		let replaceStr = 'tp4';
+		if (text.includes('open')) return 'open';
 		if (!text.includes(replaceStr)) return undefined;
-		let i1 = text.indexOf(replaceStr);
-		if (i1 === -1) {
-			i1 = text.indexOf('tp');
-			replaceStr = 'tp';
-		}
+		const i1 = text.indexOf(replaceStr);
 		const i2 = text.indexOf('\n', i1 + 1);
 		const str = text.substring(i1, i2).replace(/([^0-9.])/g, '').trim();
 		return parseFloat(str);
 	};
-
+	
 	// Get TP5
 	const tp5 = () => {
 		let replaceStr = 'tp5';
+		if (text.includes('open')) return 'open';
 		if (!text.includes(replaceStr)) return undefined;
-		let i1 = text.indexOf(replaceStr);
-		if (i1 === -1) {
-			i1 = text.indexOf('tp');
-			replaceStr = 'tp';
-		}
+		const i1 = text.indexOf(replaceStr);
 		const i2 = text.indexOf('\n', i1 + 1);
 		const str = text.substring(i1, i2).replace(/([^0-9.])/g, '').trim();
 		return parseFloat(str);
@@ -116,7 +106,7 @@ const handleSignal = (msg: Api.Message): ForexSignalSetup | undefined => {
 	return {
 		cross: cross(),
 		side: side(),
-		orderType: 'limit',
+		orderType: type(),
 		entry: entry(),
 		sl: sl(),
 		tp1: tp1(),
@@ -128,7 +118,7 @@ const handleSignal = (msg: Api.Message): ForexSignalSetup | undefined => {
 };
 const handleUpdate = async (msg: Api.Message): Promise<ForexSignal | undefined> => {
 	const original = await msg.getReplyMessage();
-	const msgId = original?.id || Math.random();
+	const msgId = original?.id || 0;
 	const text = msg.message.toLowerCase();
 	const dbId = getId(msgId, new Date(msg.date * 1000) || new Date());
 
@@ -138,11 +128,36 @@ const handleUpdate = async (msg: Api.Message): Promise<ForexSignal | undefined> 
 
 	const include = (word: string) => text.includes(word);
 
-	if (include('sl hit')) return;
-
-	if (include('be hit')) return;
-
-	if (include('tp hit')) return;
+	if (
+		include('move sl') ||
+		include('change sl') ||
+		include('close at') ||
+		include('close this trade at')
+	) {
+		const moveSl = () => {
+			const text1 = text + '\n';
+			const rStr = 'sl';
+			const i1 = text1.indexOf(rStr);
+			const i2 = text1.indexOf('\n');
+			const normText = text1.substring(i1, i2);
+			if (normText.includes('entry')) return 'entry';
+			if (normText.includes('tp')) return 'tp';
+			if (normText.includes('tp1')) return 'tp1';
+			if (normText.includes('tp2')) return 'tp2';
+			if (normText.includes('tp3')) return 'tp3';
+			if (normText.includes('tp4')) return 'tp4';
+			if (normText.includes('tp5')) return 'tp5';
+			const res = normText.replace(/([^a-z])/, '').trim();
+			return parseFloat(res);
+		};
+		return {
+			...document.data() as ForexSignal,
+			action: ['move-sl'],
+			actionOptions: {
+				moveSl: moveSl()
+			},
+		};
+	}
 
 	if (include('cancel')) {
 		return {
@@ -151,31 +166,47 @@ const handleUpdate = async (msg: Api.Message): Promise<ForexSignal | undefined> 
 		};
 	}
 
-	if (include('secure')) {
+	if (
+		include('close') ||
+		include('close this trade') ||
+		include('close trade') ||
+		include('close now') ||
+		include('close this order')
+	) {
 		return {
 			...document.data() as ForexSignal,
-			action: ['break-eaven'],
-		};
+			action: ['close-all']
+		}
 	}
 
-	if (include('partial')) {
+	if (
+		include('close half')
+	) {
 		return {
 			...document.data() as ForexSignal,
 			action: ['partial-close'],
 			actionOptions: {
 				closeQty: 0.5,
-			},
-		};
+			}
+		}
 	}
+
+	if (include('sl hit')) return;
+	if (include('tp hit')) return;
+	if (include('tp1 hit')) return;
+	if (include('tp2 hit')) return;
+	if (include('tp3 hit')) return;
+	if (include('tp4 hit')) return;
+	if (include('tp5 hit')) return;
 
 	return;
 };
 
-export const fxLegacyDbPath = (msg: Api.Message) => {
+export const fxIotaDbPath = (msg: Api.Message) => {
 	return `signals/${DB_PATH}/signals/${getId(msg.id, new Date(msg.date * 1000))}`;
 };
 
-export const fxLegacy = async (msg: Api.Message): Promise<ForexSignal | undefined> => {
+export const fxIota = async (msg: Api.Message): Promise<ForexSignal | undefined> => {
 	if (msg.isReply) {
 		logger.info('isReply');
 		return await handleUpdate(msg);
@@ -185,7 +216,7 @@ export const fxLegacy = async (msg: Api.Message): Promise<ForexSignal | undefine
 		let isValid = true;
 		if (!elabSetup) isValid = false;
 		return {
-			channel: 'fxLegacy',
+			channel: 'fxIota',
 			isValid: isValid,
 			action: ['new'],
 			date: new Date(msg.date * 1000),

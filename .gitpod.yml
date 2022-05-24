@@ -1,7 +1,22 @@
-# List the start up tasks. Learn more https://www.gitpod.io/docs/config-start-tasks/
+
 tasks:
   - before: npm i -g firebase-tools
 
   - init: yarn install
     command: yarn start
 
+
+vscode:
+  extensions:
+    - esbenp.prettier-vscode
+    - nicoespeon.abracadabra
+    - Mikael.Angular-BeastCode
+    - Angular.ng-template
+    - cyrilletuzi.angular-schematics
+    - formulahendry.auto-close-tag
+    - formulahendry.auto-rename-tag
+    - wix.vscode-import-cost
+    - PKief.material-icon-theme
+    - christian-kohler.path-intellisense
+    - TabNine.tabnine-vscode
+    - bradlc.vscode-tailwindcss

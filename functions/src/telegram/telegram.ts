@@ -1,14 +1,16 @@
 import { firestore } from 'firebase-admin';
 import { config as env } from 'firebase-functions';
 import { Api, TelegramClient } from 'telegram';
-import { NewMessage, NewMessageEvent } from 'telegram/events';
+import { NewMessage, NewMessageEvent, Raw } from 'telegram/events';
 import { StringSession } from 'telegram/sessions';
 import { CryptoSignal } from '../models/crypto-signal.model';
 import { ForexSignal } from '../models/forex-signal.model';
 import { cryptoAlertsDbPath, handleSignal as handleCryptoCoreSignal } from '../utils/crypto-alerts/handleSignal';
 import { logger } from '../utils/utils';
 import { fxLegacy, fxLegacyDbPath } from './channels/handlers/fxLegacy';
+import { fxIota, fxIotaDbPath } from './channels/handlers/fxIota';
 import { tgChannels } from './channels/tg-channels';
+import { fxLds, fxLdsDbPath } from './channels/handlers/fxLds';
 
 /* API DOCS: https://gram.js.org/ */
 
@@ -49,6 +51,7 @@ const upsert = async (path: string, data: any) => {
 
 	const createdAt = doc.data()?.createdAt || new Date();
 	data.createdAt = createdAt;
+	data.updatedAt = new Date();
 	await docRef.set(data, {
 		merge: true,
 	});
@@ -96,31 +99,47 @@ const redirectToSignalHandler = (m: Api.Message) => {
 			break;
 		case 'cryptoAlerts':
 			cryptoSignal = handleCryptoCoreSignal(m.message, m.id, new Date(m.date * 1000));
-			if (!cryptoSignal.isValid) break;
-			await log.info('I\'ve elaborated the signal, updating on the db...');
+			if (!cryptoSignal.isValid) {
+				log.error('This signal is not valid');
+				break;
+			}
 			await upsert(cryptoAlertsDbPath(cryptoSignal), cryptoSignal);
-			await log.info(`Upload completed for signal ${cryptoSignal.dbId}`);
 			break;
 		case 'fxIota':
-			/* ... */
+			fxSignal = await fxIota(m);
+			if (!fxSignal?.isValid) {
+				log.error('This signal is not valid');
+				break;
+			}
+			await upsert(fxIotaDbPath(m), fxSignal);
 			break;
 		case 'fxLds':
-			/* ... */
+			fxSignal = await fxLds(m);
+			if (!fxSignal?.isValid) {
+				log.error('This signal is not valid');
+				break;
+			}
+			await upsert(fxLdsDbPath(m), fxSignal);
 			break;
 		case 'fxLegacy':
 			fxSignal = await fxLegacy(m);
-			await log.info('I\'ve elaborated the signal, updating on the db...');
-			await log.info(fxSignal);
+			if (!fxSignal?.isValid) {
+				log.error('This signal is not valid');
+				break;
+			}
+			await upsert(fxLegacyDbPath(m), fxSignal);
 			break;
 		case 'fxResistance':
 			/* ... */
 			break;
 		case 'wheresbebo':
 			/* TESTs ONLY */
-			fxSignal = await fxLegacy(m);
-			await log.info('I\'ve elaborated the signal, updating on the db...');
-			await upsert(fxLegacyDbPath(m), fxSignal);
-			await log.info(`Upload completed for signal ${fxSignal?.dbId}`);
+			fxSignal = await fxLds(m);
+			if (!fxSignal?.isValid) {
+				log.error('This signal is not valid');
+				break;
+			}
+			await upsert(fxLdsDbPath(m), fxSignal);
 			break;
 
 		default:
@@ -134,14 +153,29 @@ const redirectToSignalHandler = (m: Api.Message) => {
 export const listenForTgMessages = async () => {
 	await init();
 
-	async function handler({ message: msg }: NewMessageEvent) {
+	const newMessage = async ({ message: msg }: NewMessageEvent) => {
 		const isSupported = isSupportedChannel(msg.chatId);
 		if (!isSupported) return log.error(`Questo canale non è supportato per i segnali: ${msg.chatId}`);
-		/* log.info(`msg => ${message.message}\n\nsupported => ${isSupported}`, 'listenForTgMessages'); */
 		redirectToSignalHandler(msg);
-		log.info(`This message was sent on Date: ${new Date(msg.date * 1000)}`);
 	}
 
-	client.addEventHandler(handler, new NewMessage({}));
+	const updateMessage = async (e: any) => {
+		if (
+			e.className !== 'UpdateEditMessage' &&
+			e.className !== 'UpdateEditChannelMessage'
+		) return;
+		const channelId = await client.getPeerId(e.message.peerId);
+		const msg = (await client.getMessages(channelId, { ids: e.message.ids }))[0];
+		if (!msg) {
+			log.error('No message found. Unable to update signal');
+		}
+		const isSupported = isSupportedChannel(msg.chatId);
+		if (!isSupported) return log.error(`Questo canale non è supportato per i segnali: ${msg.chatId}`);
+		redirectToSignalHandler(msg);		
+	}
+
+
+	client.addEventHandler(newMessage, new NewMessage({}));
+	client.addEventHandler(updateMessage, new Raw({}));
 };
 
