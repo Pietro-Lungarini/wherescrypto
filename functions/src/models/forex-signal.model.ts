@@ -1,3 +1,5 @@
+import { Timestamp } from "./timestamp.model";
+
 export interface ForexSignalSetup {
 	cross: string;
 	side?: 'buy' | 'sell';
@@ -23,4 +25,6 @@ export interface ForexSignal {
 		moveSl?: 'entry' | 'tp' | 'tp1' | 'tp2' | 'tp3' | 'tp4' | 'tp5' | number,
 	};
 	isValid: boolean;
+	updatedAt?: Timestamp | Date;
+ 	createdAt?: Timestamp | Date;
 }

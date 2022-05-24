@@ -11,6 +11,7 @@ import { fxLegacy, fxLegacyDbPath } from './channels/handlers/fxLegacy';
 import { fxIota, fxIotaDbPath } from './channels/handlers/fxIota';
 import { tgChannels } from './channels/tg-channels';
 import { fxLds, fxLdsDbPath } from './channels/handlers/fxLds';
+import { commoditiesGamma, commoditiesGammaDbPath } from './channels/handlers/commoditiesGamma';
 
 /* API DOCS: https://gram.js.org/ */
 
@@ -44,7 +45,7 @@ const log = {
 		await client.sendMessage(-1001671886675, { message: msg });
 	},
 };
-const upsert = async (path: string, data: any) => {
+const upsert = async (path: string, data: ForexSignal | CryptoSignal) => {
 	const db = firestore();
 	const docRef = db.doc(path);
 	const doc = await docRef.get();
@@ -55,6 +56,7 @@ const upsert = async (path: string, data: any) => {
 	await docRef.set(data, {
 		merge: true,
 	});
+	await log.info(`Signal with id ${data.dbId} updated/created.`);
 };
 
 
@@ -64,12 +66,12 @@ const isSupportedChannel = (id?: bigInt.BigInteger) => {
 	let isSupported = false;
 	const normId = BigInt(parseInt(id.abs().toString()));
 	tgChannels.forEach((channel) => {
+		if (!channel.available) return;
 		const isThis = channel.id === normId;
 		if (isThis) isSupported = true;
 	});
 	return isSupported;
 };
-
 const redirectToSignalHandler = (m: Api.Message) => {
 	if (!m.chatId) return;
 	const normId = BigInt(parseInt(m.chatId?.abs().toString() || '0'));
@@ -95,7 +97,12 @@ const redirectToSignalHandler = (m: Api.Message) => {
 			/* ... */
 			break;
 		case 'commoditiesGamma':
-			/* ... */
+			fxSignal = await commoditiesGamma(m);
+			if (!fxSignal?.isValid) {
+				log.error('This signal is not valid');
+				break;
+			}
+			await upsert(commoditiesGammaDbPath(m), fxSignal);
 			break;
 		case 'cryptoAlerts':
 			cryptoSignal = handleCryptoCoreSignal(m.message, m.id, new Date(m.date * 1000));
@@ -134,12 +141,12 @@ const redirectToSignalHandler = (m: Api.Message) => {
 			break;
 		case 'wheresbebo':
 			/* TESTs ONLY */
-			fxSignal = await fxLds(m);
+			fxSignal = await commoditiesGamma(m);
 			if (!fxSignal?.isValid) {
 				log.error('This signal is not valid');
 				break;
 			}
-			await upsert(fxLdsDbPath(m), fxSignal);
+			await upsert(commoditiesGammaDbPath(m), fxSignal);
 			break;
 
 		default:
@@ -167,7 +174,7 @@ export const listenForTgMessages = async () => {
 		const channelId = await client.getPeerId(e.message.peerId);
 		const msg = (await client.getMessages(channelId, { ids: e.message.ids }))[0];
 		if (!msg) {
-			log.error('No message found. Unable to update signal');
+			log.error('Non ho trovato nessun messaggio da aggiornare. Impossibile aggiornare il segnale.');
 		}
 		const isSupported = isSupportedChannel(msg.chatId);
 		if (!isSupported) return log.error(`Questo canale non è supportato per i segnali: ${msg.chatId}`);

@@ -1,3 +1,5 @@
+import { Timestamp } from "./timestamp.model";
+
 export interface CryptoSignalExchanges extends Array<string> {
   [index: number]:
     | 'Binance'
@@ -73,4 +75,6 @@ export interface CryptoSignal {
   notes?: string;
   setup?: CryptoSignalSetup;
   isValid: boolean;
+  updatedAt?: Timestamp | Date;
+  createdAt?: Timestamp | Date;
 }

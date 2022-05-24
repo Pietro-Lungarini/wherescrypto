@@ -3,7 +3,7 @@ import { Api } from 'telegram';
 import { ForexSignal, ForexSignalSetup } from '../../../models/forex-signal.model';
 import { logger } from '../../../utils/utils';
 
-const DB_PATH = 'fxIota';
+const DB_PATH = 'commoditiesGamma';
 
 const getId = (msgId: number, msgDate: Date) => {
 	return `fx_${msgId}_${new Date(msgDate).getTime()}`;
@@ -16,23 +16,27 @@ const handleSignal = (msg: Api.Message): ForexSignalSetup | undefined => {
 		return text.includes('buy') ? 'buy' : text.includes('sell') ? 'sell' : undefined;
 	};
 
+	const type = () => {
+		return text.includes('limit') ?
+        'limit' :
+        text.includes('stop') ?
+        'stop' :
+        'market';
+	};
+
 	// Get Cross
 	const cross = () => {
-		const i1 = 0;
+		const i1 = text.indexOf(side() || type());
 		const i2 = text.indexOf('\n');
 		const str = text.substring(i1, i2).trim();
-		return str;
+		return str.replace(side() || '', '').replace(type(), '').trim();
 	};
 
 	if (!cross()) return;
 
-	const type = () => {
-		return text.includes('limit') ? 'limit' : 'market';
-	};
-
 	// Get Entry
 	const entry = () => {
-		const i1 = text.indexOf('@');
+		const i1 = text.indexOf('entry');
 		const i2 = text.indexOf('\n', i1 + 1);
 		const str = text.substring(i1, i2).replace(/([^0-9.])/g, '').trim();
 		return parseFloat(str);
@@ -40,10 +44,9 @@ const handleSignal = (msg: Api.Message): ForexSignalSetup | undefined => {
 
 	// Get StopLoss
 	const sl = () => {
-		const normText = text.replace(/\(.*\)/, '').trim();
-		const i1 = normText.indexOf('sl');
-		const i2 = normText.indexOf('\n', i1 + 1);
-		const str = normText.substring(i1, i2).replace(/([^0-9.])/g, '').trim();
+		const i1 = text.indexOf('sl');
+		const i2 = text.indexOf('\n', i1 + 1);
+		const str = text.substring(i1, i2).replace(/([^0-9.])/g, '').trim();
 		return parseFloat(str);
 	};
 
@@ -133,9 +136,7 @@ const handleUpdate = async (msg: Api.Message): Promise<ForexSignal | undefined> 
 
 	if (
 		include('move sl') ||
-		include('change sl') ||
-		include('close at') ||
-		include('close this trade at')
+		include('move your sl')
 	) {
 		const moveSl = () => {
 			const text1 = text + '\n';
@@ -170,11 +171,7 @@ const handleUpdate = async (msg: Api.Message): Promise<ForexSignal | undefined> 
 	}
 
 	if (
-		include('close') ||
-		include('close this trade') ||
-		include('close trade') ||
-		include('close now') ||
-		include('close this order')
+		include('close it')
 	) {
 		return {
 			...document.data() as ForexSignal,
@@ -197,11 +194,11 @@ const handleUpdate = async (msg: Api.Message): Promise<ForexSignal | undefined> 
 	return;
 };
 
-export const fxIotaDbPath = (msg: Api.Message) => {
+export const commoditiesGammaDbPath = (msg: Api.Message) => {
 	return `signals/${DB_PATH}/signals/${getId(msg.id, new Date(msg.date * 1000))}`;
 };
 
-export const fxIota = async (msg: Api.Message): Promise<ForexSignal | undefined> => {
+export const commoditiesGamma = async (msg: Api.Message): Promise<ForexSignal | undefined> => {
 	if (msg.isReply) {
 		logger.info('isReply');
 		return await handleUpdate(msg);
@@ -211,7 +208,7 @@ export const fxIota = async (msg: Api.Message): Promise<ForexSignal | undefined>
 		let isValid = true;
 		if (!elabSetup) isValid = false;
 		return {
-			channel: 'fxIota',
+			channel: 'commoditiesGamma',
 			isValid: isValid,
 			action: ['new'],
 			date: new Date(msg.date * 1000),

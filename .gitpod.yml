@@ -1,8 +1,6 @@
 
 tasks:
-  - before: npm i -g firebase-tools
-
-  - init: yarn install
+  - init: yarn install && npm i -g firebase-tools
     command: yarn start
 
 

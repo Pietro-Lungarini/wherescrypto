@@ -77,33 +77,36 @@ const handleSignal = (msg: Api.Message): ForexSignalSetup | undefined => {
 	// Get TP3
 	const tp3 = () => {
 		let replaceStr = 'tp3 👉🏽';
-		if (text.includes('open')) return 'open';
 		if (!text.includes(replaceStr)) return undefined;
 		const i1 = text.indexOf(replaceStr);
 		const i2 = text.indexOf('\n', i1 + 1);
-		const str = text.substring(i1, i2).replace(/([^0-9.])/g, '').trim();
+		const subStr = text.substring(i1, i2);
+		if (subStr.includes('open')) return 'open';
+		const str = subStr.replace(/([^0-9.])/g, '').trim();
 		return parseFloat(str);
 	};
 
 	// Get TP4
 	const tp4 = () => {
 		let replaceStr = 'tp4 👉🏽';
-		if (text.includes('open')) return 'open';
 		if (!text.includes(replaceStr)) return undefined;
 		const i1 = text.indexOf(replaceStr);
 		const i2 = text.indexOf('\n', i1 + 1);
-		const str = text.substring(i1, i2).replace(/([^0-9.])/g, '').trim();
+		const subStr = text.substring(i1, i2);
+		if (subStr.includes('open')) return 'open';
+		const str = subStr.replace(/([^0-9.])/g, '').trim();
 		return parseFloat(str);
 	};
 	
 	// Get TP5
 	const tp5 = () => {
 		let replaceStr = 'tp5 👉🏽';
-		if (text.includes('open')) return 'open';
 		if (!text.includes(replaceStr)) return undefined;
 		const i1 = text.indexOf(replaceStr);
 		const i2 = text.indexOf('\n', i1 + 1);
-		const str = text.substring(i1, i2).replace(/([^0-9.])/g, '').trim();
+		const subStr = text.substring(i1, i2);
+		if (subStr.includes('open')) return 'open';
+		const str = subStr.replace(/([^0-9.])/g, '').trim();
 		return parseFloat(str);
 	};
 
@@ -149,7 +152,7 @@ const handleUpdate = async (msg: Api.Message): Promise<ForexSignal | undefined> 
 			if (normText.includes('tp3')) return 'tp3';
 			if (normText.includes('tp4')) return 'tp4';
 			if (normText.includes('tp5')) return 'tp5';
-			const res = text.replace(/([^a-z])/, '').trim();
+			const res = text.replace(/([^0-9.])/g, '').trim();
 			return parseFloat(res);
 		};
 		return {
@@ -199,14 +202,6 @@ const handleUpdate = async (msg: Api.Message): Promise<ForexSignal | undefined> 
             }
         }
     }
-
-	if (include('sl hit')) return;
-	if (include('tp hit')) return;
-	if (include('tp1 hit')) return;
-	if (include('tp2 hit')) return;
-	if (include('tp3 hit')) return;
-	if (include('tp4 hit')) return;
-	if (include('tp5 hit')) return;
 
 	return;
 };

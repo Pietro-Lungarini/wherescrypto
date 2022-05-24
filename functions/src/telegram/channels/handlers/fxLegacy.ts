@@ -59,13 +59,9 @@ const handleSignal = (msg: Api.Message): ForexSignalSetup | undefined => {
 
 	// Get TP2
 	const tp2 = () => {
-		let replaceStr = 'tp2';
+		const replaceStr = 'tp2';
 		if (!text.includes(replaceStr)) return undefined;
-		let i1 = text.indexOf(replaceStr);
-		if (i1 === -1) {
-			i1 = text.indexOf('tp');
-			replaceStr = 'tp';
-		}
+		const i1 = text.indexOf(replaceStr);
 		const i2 = text.indexOf('\n', i1 + 1);
 		const str = text.substring(i1, i2).replace(/([^0-9.])/g, '').trim();
 		return parseFloat(str);
@@ -75,13 +71,11 @@ const handleSignal = (msg: Api.Message): ForexSignalSetup | undefined => {
 	const tp3 = () => {
 		let replaceStr = 'tp3';
 		if (!text.includes(replaceStr)) return undefined;
-		let i1 = text.indexOf(replaceStr);
-		if (i1 === -1) {
-			i1 = text.indexOf('tp');
-			replaceStr = 'tp';
-		}
+		const i1 = text.indexOf(replaceStr);
 		const i2 = text.indexOf('\n', i1 + 1);
-		const str = text.substring(i1, i2).replace(/([^0-9.])/g, '').trim();
+		const subStr = text.substring(i1, i2);
+		if (subStr.includes('open')) return 'open';
+		const str = subStr.replace(/([^0-9.])/g, '').trim();
 		return parseFloat(str);
 	};
 
@@ -89,13 +83,11 @@ const handleSignal = (msg: Api.Message): ForexSignalSetup | undefined => {
 	const tp4 = () => {
 		let replaceStr = 'tp4';
 		if (!text.includes(replaceStr)) return undefined;
-		let i1 = text.indexOf(replaceStr);
-		if (i1 === -1) {
-			i1 = text.indexOf('tp');
-			replaceStr = 'tp';
-		}
+		const i1 = text.indexOf(replaceStr);
 		const i2 = text.indexOf('\n', i1 + 1);
-		const str = text.substring(i1, i2).replace(/([^0-9.])/g, '').trim();
+		const subStr = text.substring(i1, i2);
+		if (subStr.includes('open')) return 'open';
+		const str = subStr.replace(/([^0-9.])/g, '').trim();
 		return parseFloat(str);
 	};
 
@@ -103,13 +95,11 @@ const handleSignal = (msg: Api.Message): ForexSignalSetup | undefined => {
 	const tp5 = () => {
 		let replaceStr = 'tp5';
 		if (!text.includes(replaceStr)) return undefined;
-		let i1 = text.indexOf(replaceStr);
-		if (i1 === -1) {
-			i1 = text.indexOf('tp');
-			replaceStr = 'tp';
-		}
+		const i1 = text.indexOf(replaceStr);
 		const i2 = text.indexOf('\n', i1 + 1);
-		const str = text.substring(i1, i2).replace(/([^0-9.])/g, '').trim();
+		const subStr = text.substring(i1, i2);
+		if (subStr.includes('open')) return 'open';
+		const str = subStr.replace(/([^0-9.])/g, '').trim();
 		return parseFloat(str);
 	};
 
