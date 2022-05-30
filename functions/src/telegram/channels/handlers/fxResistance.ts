@@ -5,7 +5,7 @@ import {
   ForexSignalSetup,
 } from '../../../models/forex-signal.model';
 
-const DB_PATH = 'commoditiesGamma';
+const DB_PATH = 'fxResistance';
 
 const getId = (msgId: number, msgDate: Date) => {
   return `fx_${msgId}_${new Date(msgDate).getTime()}`;
@@ -32,21 +32,27 @@ const handleSignal = (msg: Api.Message): ForexSignalSetup | undefined => {
 
   // Get Cross
   const cross = () => {
-    const i1 = text.indexOf(side() || type());
+    const i1 = text.indexOf(side() || '');
     if (i1 === -1) return '';
     const i2 = text.indexOf('\n');
-    const str = text.substring(i1, i2).trim();
-    return str
+    const subStr = text.substring(i1, i2);
+    const str = subStr
+      .replace(/[-]/g, '')
+      .replace(/[:]/g, '')
+      .replace(/[🏆]/g, '')
+      .replace(/[📈]/g, '')
+      .replace(/[📉]/g, '')
+      .replace(/[💰]/g, '')
       .replace(side() || '', '')
-      .replace(type(), '')
-      .trim();
+      .replace(type() || '', '');
+    return str.trim();
   };
 
   if (!cross()) return;
 
   // Get Entry
   const entry = () => {
-    const i1 = text.indexOf('entry');
+    const i1 = text.indexOf('entrée');
     const i2 = text.indexOf('\n', i1 + 1);
     const str = text
       .substring(i1, i2)
@@ -161,19 +167,33 @@ const handleUpdate = async (
   const original = await msg.getReplyMessage();
   const text = msg.message.toLowerCase();
   if (!original) return;
-  const docRef = firestore().doc(commoditiesGammaDbPath(original));
+  const docRef = firestore().doc(fxResistanceDbPath(original));
   const document = await docRef.get();
   if (!document.exists) return;
 
   const include = (word: string) => text.includes(word);
 
-  if (include('move sl') || include('move your sl')) {
+  if (include('out by the market') && !include('after')) {
+    return {
+      ...(document.data() as ForexSignal),
+      action: ['close-all'],
+    };
+  }
+
+  if (
+    include('move stop loss') ||
+    include('out by the market after') ||
+    include('close at') ||
+    include('out break even')
+  ) {
     const moveSl = () => {
       const text1 = text + '\n';
       const rStr = 'sl';
       const i1 = text1.indexOf(rStr);
       const i2 = text1.indexOf('\n');
       const normText = text1.substring(i1, i2);
+      if (normText.includes('break even')) return 'entry';
+      if (normText.includes('be')) return 'entry';
       if (normText.includes('entry')) return 'entry';
       if (normText.includes('tp')) return 'tp';
       if (normText.includes('tp1')) return 'tp1';
@@ -193,41 +213,31 @@ const handleUpdate = async (
     };
   }
 
-  if (include('cancel')) {
+  if (include('sorti be')) {
+    return {
+      ...(document.data() as ForexSignal),
+      action: ['break-even'],
+    };
+  }
+
+  if (include('cancel') || include('cancel')) {
     return {
       ...(document.data() as ForexSignal),
       action: ['cancel'],
     };
   }
 
-  if (include('close it')) {
-    return {
-      ...(document.data() as ForexSignal),
-      action: ['close-all'],
-    };
-  }
-
-  if (include('close half')) {
-    return {
-      ...(document.data() as ForexSignal),
-      action: ['partial-close'],
-      actionOptions: {
-        closeQty: 0.5,
-      },
-    };
-  }
-
   return;
 };
 
-export const commoditiesGammaDbPath = (msg: Api.Message) => {
+export const fxResistanceDbPath = (msg: Api.Message) => {
   return `signals/${DB_PATH}/signals/${getId(
     msg.id,
     new Date(msg.date * 1000)
   )}`;
 };
 
-export const commoditiesGamma = async (
+export const fxResistance = async (
   msg: Api.Message
 ): Promise<ForexSignal | undefined> => {
   if (msg.isReply) {
@@ -237,7 +247,7 @@ export const commoditiesGamma = async (
     let isValid = true;
     if (!elabSetup) isValid = false;
     return {
-      channel: 'commoditiesGamma',
+      channel: 'fxResistance',
       isValid: isValid,
       action: ['new'],
       date: new Date(msg.date * 1000),

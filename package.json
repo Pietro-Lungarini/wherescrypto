@@ -23,7 +23,6 @@
     "@angular/router": "13.3.7",
     "@ngneat/tailwind": "7.0.3",
     "core-js": "3.8.3",
-    "metaapi.cloud-sdk": "^19.5.0",
     "ngx-bootstrap-icons": "1.8.2",
     "postcss-selector-parser": "6.0.10",
     "rxfire": "6.0.3",

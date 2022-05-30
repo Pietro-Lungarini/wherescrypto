@@ -1,4 +1,3 @@
-import { CreateMarketTradeOptions, PendingTradeOptions, StopLimitPendingTradeOptions, StopOptions } from 'metaapi.cloud-sdk';
 import { ForexSymbols } from './forexSymbols.model';
 
 
@@ -8,9 +7,9 @@ export interface ForexSignal {
 	symbol: ForexSymbols;
 	lot: number;
 	openPrice: number;
-	stopLoss?: number | StopOptions;
-	takeProfit?: number | StopOptions;
-	marketOptions?: CreateMarketTradeOptions;
-	stopLimitOptions?: StopLimitPendingTradeOptions;
-	pendingOptions?: PendingTradeOptions;
+	stopLoss?: number | any;
+	takeProfit?: number | any;
+	marketOptions?: any;
+	stopLimitOptions?: any;
+	pendingOptions?: any;
 }

@@ -1,38 +1,38 @@
-import { Component, OnDestroy, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { getFunctions } from '@angular/fire/functions';
 import { httpsCallable } from 'rxfire/functions';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ForexRequest } from './shared/models/forex.model';
 import { ForexSignal } from './shared/models/forexSignal.model';
+import { MTAccount } from './shared/models/mtaccount.model';
 import { FirebaseUtilsService } from './shared/services/firebase-utils.service';
 import { MetaApiErrorManagerService } from './shared/services/meta-api-error-manager.service';
 
-
 @Component({
-  selector: "app-root",
-  templateUrl: "./app.component.html",
-  styles: []
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styles: [],
 })
 export class AppComponent implements OnInit, OnDestroy {
-	title = "wherescrypto";
-	destroyed$ = new Subject();
+  title = 'wherescrypto';
+  destroyed$ = new Subject();
 
-	constructor(
-		private db: FirebaseUtilsService,
-		private metaApiErr: MetaApiErrorManagerService
-	) { }
+  constructor(
+    private db: FirebaseUtilsService,
+    private metaApiErr: MetaApiErrorManagerService
+  ) {}
 
   ngOnInit(): void {
     this.verify();
- 	}
- 
-	ngOnDestroy(): void {
-		this.destroyed$.next();
-	}
+  }
 
-	async verify(): Promise<void> {
-		/* const id = 354906;
+  ngOnDestroy(): void {
+    this.destroyed$.next();
+  }
+
+  async verify(): Promise<void> {
+    /* const id = 354906;
 		const fn = getFunctions(undefined, 'europe-west2');
 		const verifyClient = httpsCallable<iGeniusRequest, iGeniusUser>(fn, "verifyClient");
 		const res = verifyClient({id});
@@ -46,25 +46,14 @@ export class AppComponent implements OnInit, OnDestroy {
 			.pipe(takeUntil(this.destroyed$))
 			.subscribe((data) => console.log(data)); */
 
-		/* const user = JSON.parse(localStorage.getItem('testUser') || '');
+    /* const user = JSON.parse(localStorage.getItem('testUser') || '');
 		console.log(user.lastOrder); */
 
-		const fn = getFunctions(undefined, 'europe-west2');
-		const verifyClient = httpsCallable<ForexRequest, any>(fn, "testSignal");
-		const signal: ForexSignal = {
-			symbol: ['GBPAUD.s'],
-			lot: 0.01,
-			openPrice: 1.74956,
-			side: 'buy',
-			type: 'limit',
-			takeProfit: 2,
-			pendingOptions: { trailingStopLoss: { distance: { distance: 20, units: 'RELATIVE_PIPS' } } }
-		};
-		const res = verifyClient({ id: 'edf93eb6-f9d5-472b-bc5e-d19c1c871eb3', signal });
-		res.pipe(takeUntil(this.destroyed$))
-			.subscribe((res) => {
-				const msg = this.metaApiErr.handleError(res.numericCode, res.stringCode, res.message);
-				console.log(msg.client);
-			});
-	}
+    const fn = getFunctions(undefined, 'europe-west2');
+    const testConvertSignal = httpsCallable<MTAccount, any>(fn, 'testConvertSignal');
+    const res = testConvertSignal();
+    res.pipe(takeUntil(this.destroyed$)).subscribe((res) => {
+      console.log(res);
+    });
+  }
 }
