@@ -21,6 +21,19 @@ export const getAccountConnection = async (accountId: string) => {
   const account = await getMTAccount(accountId);
   if (!account) return;
   try {
+    switch (account.state) {
+      case 'CREATED':
+        await account.deploy();
+        break;
+      case 'DEPLOYING':
+        await account.waitDeployed();
+        break;
+      case 'DEPLOYED':
+        break;
+    
+      default:
+        return;
+    }
     const connection = account.getRPCConnection();
     await connection.connect();
     await connection.waitSynchronized();

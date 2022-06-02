@@ -48,12 +48,5 @@ export class AppComponent implements OnInit, OnDestroy {
 
     /* const user = JSON.parse(localStorage.getItem('testUser') || '');
 		console.log(user.lastOrder); */
-
-    const fn = getFunctions(undefined, 'europe-west2');
-    const testConvertSignal = httpsCallable<MTAccount, any>(fn, 'testConvertSignal');
-    const res = testConvertSignal();
-    res.pipe(takeUntil(this.destroyed$)).subscribe((res) => {
-      console.log(res);
-    });
   }
 }

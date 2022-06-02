@@ -1,7 +1,7 @@
 import * as admin from 'firebase-admin';
 import * as ffn from 'firebase-functions';
 import { verifyClient } from './igenius/igenius';
-import { getAccountRisk, sendSignalToAccounts } from './metaapi/handleForexOrder';
+import { sendSignalToAccounts } from './metaapi/handleForexOrder';
 import { createMtAccount } from './metaapi/metaapi';
 import { ForexSignal } from './models/forex-signal.model';
 import { iGeniusRequestedUsers } from './models/igenius.model';
@@ -48,10 +48,15 @@ exports.convertGammaSignal = functions
   })
   .firestore.document('signals/commoditiesGamma/signals/{documentId}')
   .onWrite(async (change) => {
+    // DELETED SIGNAL
     if (!change.after.exists) return;
-    const signal = change.after.data() as ForexSignal;
-    await sendSignalToAccounts(signal);
-    return;
+    
+    // NEW SIGNAL
+    if (change.after.exists) { 
+      const signal = change.after.data() as ForexSignal;
+      await sendSignalToAccounts(signal);
+      return;
+    }
   });
 exports.convertIotaSignal = functions
   .runWith({
@@ -60,10 +65,15 @@ exports.convertIotaSignal = functions
   })
   .firestore.document('signals/fxIota/signals/{documentId}')
   .onWrite(async (change) => {
+    // DELETED SIGNAL
     if (!change.after.exists) return;
-    const signal = change.after.data() as ForexSignal;
-    await sendSignalToAccounts(signal);
-    return;
+    
+    // NEW SIGNAL
+    if (change.after.exists) { 
+      const signal = change.after.data() as ForexSignal;
+      await sendSignalToAccounts(signal);
+      return;
+    }
   });
 exports.convertLdsSignal = functions
   .runWith({
@@ -72,10 +82,15 @@ exports.convertLdsSignal = functions
   })
   .firestore.document('signals/fxLds/signals/{documentId}')
   .onWrite(async (change) => {
+    // DELETED SIGNAL
     if (!change.after.exists) return;
-    const signal = change.after.data() as ForexSignal;
-    await sendSignalToAccounts(signal);
-    return;
+    
+    // NEW SIGNAL
+    if (change.after.exists) { 
+      const signal = change.after.data() as ForexSignal;
+      await sendSignalToAccounts(signal);
+      return;
+    }
   });
 exports.convertLegacySignal = functions
   .runWith({
@@ -84,10 +99,15 @@ exports.convertLegacySignal = functions
   })
   .firestore.document('signals/fxLegacy/signals/{documentId}')
   .onWrite(async (change) => {
+    // DELETED SIGNAL
     if (!change.after.exists) return;
-    const signal = change.after.data() as ForexSignal;
-    await sendSignalToAccounts(signal);
-    return;
+    
+    // NEW SIGNAL
+    if (change.after.exists) { 
+      const signal = change.after.data() as ForexSignal;
+      await sendSignalToAccounts(signal);
+      return;
+    }
   });
 exports.convertResistanceSignal = functions
   .runWith({
@@ -100,14 +120,11 @@ exports.convertResistanceSignal = functions
     if (!change.after.exists) return;
     
     // NEW SIGNAL
-    if (!change.after.exists) { 
+    if (change.after.exists) { 
       const signal = change.after.data() as ForexSignal;
       await sendSignalToAccounts(signal);
       return;
     }
-
-    // UPDATED SIGNAL
-    return;
   });
 
 // iGenius Verify Code
@@ -128,25 +145,3 @@ exports.verifyClient = functions
 
 listenForTgMessages();
 
-
-exports.testConvertSignal = functions.https.onCall(async () => {
-  return await getAccountRisk('CElj55WiSbVPrT9cvH8nZtSboj23', '59104c28-bba3-4f93-8d17-5738cdb9809a', {
-    channel: 'fxIota',
-    isValid: true,
-    action: ['new'],
-    date: new Date(),
-    dbId: 'testsignal',
-    id: 3232,
-    setup: {
-      cross: 'xauusd',
-      entry: 1858,
-      orderType: 'limit',
-      side: 'sell',
-      sl: 1863,
-      tp1: 1856,
-      tp2: 1853,
-      tp3: 1848,
-      tp4: 1824,
-    }
-  })
-})

@@ -2,6 +2,12 @@ import { CreateMarketTradeOptions, PendingTradeOptions, StopLimitPendingTradeOpt
 import { ForexSymbols } from './forexSymbols.model';
 
 export interface MTForexSignal {
+	channel: "binaryAlpha" | "binaryOmega" | "binaryDelta" | "cryptoAlerts" | "fxLegacy" | "fxResistance" | "fxIota" | "fxLds" | "commoditiesAlpha" | "commoditiesGamma" | "wheresbebo";
+	actions?: ("cancel" | "close-all" | "partial-close" | "signal-update" | "break-even" | "move-sl" | "new")[];
+	actionOptions?: {
+    closeQty?: number;
+    moveSl?: 'entry' | 'tp' | 'tp1' | 'tp2' | 'tp3' | 'tp4' | 'tp5' | number;
+  };
 	side: 'buy' | 'sell';
 	type: 'limit' | 'market' | 'stop' | 'stop-limit';
 	symbol: ForexSymbols;

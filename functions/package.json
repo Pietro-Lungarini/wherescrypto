@@ -32,6 +32,8 @@
 		"discord.js": "^13.6.0",
 		"firebase-admin": "10.2.0",
 		"firebase-functions": "^3.21.2",
+		"firebase-tools": "^11.0.1",
+		"g": "^2.0.1",
 		"kucoin-api": "0.0.3",
 		"lodash": "4.17.21",
 		"metaapi.cloud-sdk": "^19.5.0",

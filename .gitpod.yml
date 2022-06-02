@@ -1,6 +1,6 @@
 
 tasks:
-  - init: yarn install && npm i -g firebase-tools
+  - init: yarn install && npm i -g firebase-tools && npm install -g @angular/cli
     command: yarn start
 
 
